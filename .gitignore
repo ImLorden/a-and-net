@@ -7,3 +7,4 @@ public/
 .deploy_git/ # hexo deploy 可能会生成的临时文件夹
 .npm/
 .vscode/ # VS Code 配置
+.deploy_git/
