@@ -101,4 +101,6 @@ theme: landscape
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: ssh://jay@47.109.159.2:2222/var/repo/a-net-blog-deploy.git
+  branch: master # 或者 main，取决于 hexo-deployer-git 默认推送的分支，通常是 master
