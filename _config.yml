@@ -8,7 +8,7 @@ subtitle: 'Another Personal Blog'
 description: '一个用来记录和学习通信和网络的站点。'
 keywords: Network, blog, learning, sharing
 author: Jay Lorden
-language: zh
+language: zh-CN
 timezone: 'Asia/Shanghai'
 
 # URL
@@ -96,7 +96,7 @@ ignore:
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: fluid
 
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
