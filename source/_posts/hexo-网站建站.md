@@ -1,7 +1,17 @@
 ---
 title: hexo 网站建站
 date: 2025-06-17 15:58:01
-tags:
+tags: 
+    - hexo 
+    - 前端 
+    - 服务器 
+comments: true
+categories: 
+    - Computer 
+    - web
+excerpt: 这是摘要
+index_img: /imgs/fuji.png
+banner_img: /imgs/fuji.png
 ---
 ## 基础知识
 
@@ -293,16 +303,16 @@ git --work-tree="${PUBLIC_WWW}" checkout -f master
 代码段
 
 ```mermaid
-flowchart TD
-    A[本地电脑：你编辑 Hexo 源文件] --> B{本地命令}
-    B -- hexo clean --> C[本地: 清理生成目录]
-    B -- hexo generate --> D[本地: 生成静态文件到 public/]
-    B -- hexo deploy --> E[本地: 将 public/ 内容作为 Git 推送]
-    E -- SSH 连接 & Git Push --> F[远程服务器: Git 裸仓库]
-    F -- 接收推送后触发 --> G[远程服务器: post-receive 钩子脚本自动执行]
-    G -- 脚本内容 --> H[远程服务器: 检出文件到指定目录]
-    H --> I[远程服务器: Nginx 提供服务]
-    I -- 用户浏览器访问 --> J[用户: 看到更新后的博客网站]
+graph TD
+    A[本地电脑] --> B{本地命令}
+    B -->|hexo clean| C[清理生成目录]
+    B -->|hexo generate| D[生成静态文件]
+    B -->|hexo deploy| E[Git推送]
+    E -->|SSH连接 & Git Push| F[Git裸仓库]
+    F -->|触发| G[执行钩子脚本]
+    G -->|检出文件| H[部署目录]
+    H --> I[Nginx服务]
+    I --> J[用户访问]
 ```
 
 通过这一系列步骤和 Git Hooks 的巧妙运用，你实现了从本地内容创作到远程网站更新的自动化流程，极大地提高了效率，让你可以专注于内容的创作本身。
