@@ -8,8 +8,8 @@
 <head>
   <meta charset="UTF-8">
 
-  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
-  <link rel="icon" href="/img/fluid.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="/a-and-net/img/fluid.png">
+  <link rel="icon" href="/a-and-net/img/fluid.png">
   
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
@@ -22,17 +22,17 @@
     <meta name="description" content="本文基于产品运营业务，意在搭建一个高效精确的知识库和查询功能。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一个RAG系统的实现">
-<meta property="og:url" content="http://aandnet.lorden.xyz/2025/07/09/%E4%B8%80%E4%B8%AARAG%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:url" content="https://imlorden.github.io/a-and-net/2025/07/09/%E4%B8%80%E4%B8%AARAG%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
 <meta property="og:site_name" content="四维">
 <meta property="og:description" content="本文基于产品运营业务，意在搭建一个高效精确的知识库和查询功能。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://aandnet.lorden.xyz/imgs/fuji.png">
+<meta property="og:image" content="https://imlorden.github.io/a-and-net/imgs/fuji.png">
 <meta property="article:published_time" content="2025-07-09T08:00:44.000Z">
-<meta property="article:modified_time" content="2025-09-30T02:46:35.260Z">
+<meta property="article:modified_time" content="2025-09-30T02:52:19.282Z">
 <meta property="article:author" content="Jay Lorden">
 <meta property="article:tag" content="Python">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://aandnet.lorden.xyz/imgs/fuji.png">
+<meta name="twitter:image" content="https://imlorden.github.io/a-and-net/imgs/fuji.png">
   
   
   
@@ -60,12 +60,12 @@
 <link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
 
 
-<link  rel="stylesheet" href="/css/main.css" />
+<link  rel="stylesheet" href="/a-and-net/css/main.css" />
 
 
-  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  <link id="highlight-css" rel="stylesheet" href="/a-and-net/css/highlight.css" />
   
-    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+    <link id="highlight-css-dark" rel="stylesheet" href="/a-and-net/css/highlight-dark.css" />
   
 
 
@@ -74,15 +74,15 @@
   <script id="fluid-configs">
     var Fluid = window.Fluid || {};
     Fluid.ctx = Object.assign({}, Fluid.ctx)
-    var CONFIG = {"hostname":"aandnet.lorden.xyz","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+    var CONFIG = {"hostname":"imlorden.github.io","root":"/a-and-net/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/a-and-net/local-search.xml","include_content_in_search":true};
 
     if (CONFIG.web_analytics.follow_dnt) {
       var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
       Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
     }
   </script>
-  <script  src="/js/utils.js" ></script>
-  <script  src="/js/color-schema.js" ></script>
+  <script  src="/a-and-net/js/utils.js" ></script>
+  <script  src="/a-and-net/js/color-schema.js" ></script>
   
 
 
@@ -99,7 +99,7 @@
 <div class="header-inner" style="height: 70vh;">
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
-    <a class="navbar-brand" href="/">
+    <a class="navbar-brand" href="/a-and-net/">
       <strong>探索世界</strong>
     </a>
 
@@ -118,7 +118,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/" target="_self">
+              <a class="nav-link" href="/a-and-net/" target="_self">
                 <i class="iconfont icon-home-fill"></i>
                 <span>首页</span>
               </a>
@@ -130,7 +130,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
+              <a class="nav-link" href="/a-and-net/archives/" target="_self">
                 <i class="iconfont icon-archive-fill"></i>
                 <span>归档</span>
               </a>
@@ -142,7 +142,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
+              <a class="nav-link" href="/a-and-net/categories/" target="_self">
                 <i class="iconfont icon-category-fill"></i>
                 <span>分类</span>
               </a>
@@ -154,7 +154,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
+              <a class="nav-link" href="/a-and-net/tags/" target="_self">
                 <i class="iconfont icon-tags-fill"></i>
                 <span>标签</span>
               </a>
@@ -166,7 +166,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/tool/" target="_self">
+              <a class="nav-link" href="/a-and-net/tool/" target="_self">
                 <i class="iconfont icon-briefcase"></i>
                 <span>工具</span>
               </a>
@@ -178,7 +178,7 @@
           
           
             <li class="nav-item">
-              <a class="nav-link" href="/about/" target="_self">
+              <a class="nav-link" href="/a-and-net/about/" target="_self">
                 <i class="iconfont icon-user-fill"></i>
                 <span>关于</span>
               </a>
@@ -208,7 +208,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/imgs/fuji.png') no-repeat center center; background-size: cover;">
+     style="background: url('/a-and-net/imgs/fuji.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -336,7 +336,7 @@
 </li>
 </ol>
 <p>以下是一个简单的搭建原理图：</p>
-<p><img src="/imgs/RAG%20%E7%A4%BA%E6%84%8F%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="RAG 示意图"></p>
+<p><img src="/a-and-net/imgs/RAG%20%E7%A4%BA%E6%84%8F%E5%9B%BE.png" srcset="/a-and-net/img/loading.gif" lazyload alt="RAG 示意图"></p>
 <h3 id="核心组件概览"><a href="#核心组件概览" class="headerlink" title="核心组件概览"></a>核心组件概览</h3><ol>
 <li><strong>知识库 (Knowledge Base)：</strong> 你的云讯通内部资料（文档、FAQ 等）。</li>
 <li><strong>文档加载器 (Document Loader)：</strong> 读取你的知识库文件。</li>
@@ -422,7 +422,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Python/" class="category-chain-item">Python</a>
+  <a href="/a-and-net/categories/Python/" class="category-chain-item">Python</a>
   
   
 
@@ -437,7 +437,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Python/" class="print-no-link">#Python</a>
+        <a href="/a-and-net/tags/Python/" class="print-no-link">#Python</a>
       
     </div>
   
@@ -450,7 +450,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>一个RAG系统的实现</div>
-      <div>http://aandnet.lorden.xyz/2025/07/09/一个RAG系统的实现/</div>
+      <div>https://imlorden.github.io/a-and-net/2025/07/09/一个RAG系统的实现/</div>
     </div>
     <div class="license-meta">
       
@@ -498,7 +498,7 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/06/17/hexo-%E7%BD%91%E7%AB%99%E5%BB%BA%E7%AB%99/" title="hexo 网站建站">
+                      <a href="/a-and-net/2025/06/17/hexo-%E7%BD%91%E7%AB%99%E5%BB%BA%E7%AB%99/" title="hexo 网站建站">
                         <span class="hidden-mobile">hexo 网站建站</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
@@ -642,8 +642,8 @@
 
 <script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
 <script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
-<script  src="/js/events.js" ></script>
-<script  src="/js/plugins.js" ></script>
+<script  src="/a-and-net/js/events.js" ></script>
+<script  src="/a-and-net/js/plugins.js" ></script>
 
 
   <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
@@ -665,7 +665,7 @@
 
 
   
-    <script  src="/js/img-lazyload.js" ></script>
+    <script  src="/a-and-net/js/img-lazyload.js" ></script>
   
 
 
@@ -764,7 +764,7 @@
 
   <script>Fluid.plugins.imageCaption();</script>
 
-  <script  src="/js/local-search.js" ></script>
+  <script  src="/a-and-net/js/local-search.js" ></script>
 
 
 
@@ -772,7 +772,7 @@
 
 <!-- 主题的启动项，将它保持在最底部 -->
 <!-- the boot of the theme, keep it at the bottom -->
-<script  src="/js/boot.js" ></script>
+<script  src="/a-and-net/js/boot.js" ></script>
 
 
   
