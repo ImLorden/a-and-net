@@ -1,0 +1,784 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Jay Lorden">
+  <meta name="keywords" content="Network, blog, learning, sharing">
+  
+    <meta name="description" content="本文基于产品运营业务，意在搭建一个高效精确的知识库和查询功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个RAG系统的实现">
+<meta property="og:url" content="http://aandnet.lorden.xyz/2025/07/09/%E4%B8%80%E4%B8%AARAG%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%9E%E7%8E%B0/index.html">
+<meta property="og:site_name" content="四维">
+<meta property="og:description" content="本文基于产品运营业务，意在搭建一个高效精确的知识库和查询功能。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://aandnet.lorden.xyz/imgs/fuji.png">
+<meta property="article:published_time" content="2025-07-09T08:00:44.000Z">
+<meta property="article:modified_time" content="2025-09-30T02:36:28.202Z">
+<meta property="article:author" content="Jay Lorden">
+<meta property="article:tag" content="Python">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://aandnet.lorden.xyz/imgs/fuji.png">
+  
+  
+  
+  <title>一个RAG系统的实现 - 四维</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"aandnet.lorden.xyz","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>探索世界</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tool/" target="_self">
+                <i class="iconfont icon-briefcase"></i>
+                <span>工具</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/imgs/fuji.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="一个RAG系统的实现"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-07-09 16:00" pubdate>
+          2025年7月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          23 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">一个RAG系统的实现</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="RAG"><a href="#RAG" class="headerlink" title="RAG"></a>RAG</h2><h3 id="导言"><a href="#导言" class="headerlink" title="导言"></a>导言</h3><p>我们在日常生活中遇到不知道或不清楚的知识可能会采取咨询他人、上网查询、压力AI，或者不知道算了…但如果是在工作环境中，这些办法也如都行不通。首先，许多公司内部的业务知识无法在网络上查到，这些东西一般就涉及公司机密了。AI也是同理，由于它们没有经过这些特定的内部知识的训练，同样无法有针对性的返回准确的回答。摆烂同样不行，这是任务和需求；咨询同事或许是一个好的办法，但是同事们也都有自己的事情要做，而且有的时候会收到这样的回答：“公司手册不是有吗？你认真一点吧，自己看看去！”。这句话说的很对，但许多人何尝不是看过文档发现</p>
+<ol>
+<li>资料杂乱繁多不知道看哪一份资料；</li>
+<li>长的资料手册也找不到对应问题的位置；</li>
+<li>写资料的人表达能力有限，看不懂；</li>
+</ol>
+<p>于是你就想，怎么不能打造一个业务的知识库，将业务所涉及到的知识和方法都放在里面，然后提供一个查询功能，我问它什么，它就回答什么不就好了？<br>啊哈，这就是本文所要介绍的 RAG 系统。（不是老鼠那个 RAT）</p>
+<blockquote>
+<p>RAG (Retrieval Augmented Generation - 检索增强生成)是一种结合了信息检索和文本生成能力的人工智能范式。它旨在解决传统大语言模型（LLM）在知识时效性、事实准确性以及无法访问特定领域或最新信息等方面的局限性。</p>
+</blockquote>
+<h3 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h3><p>要搭建 RAG 系统，首先需要了解以下几个关键概念：</p>
+<ol>
+<li><strong>大语言模型 (LLM):</strong> RAG 的核心是利用强大的 LLM 进行文本生成。LLM 拥有强大的语言理解、生成和推理能力，但其知识是基于训练时的数据，可能不包含最新或特定领域的信息，也可能“一本正经地胡说八道”（hallucination）。</li>
+<li><strong>外部知识库 (Knowledge Base):</strong> 这是一个包含丰富、最新或专业知识的数据源。它可以是文档集合、数据库、网页等。在 RAG 中，LLM 不再仅仅依赖其内部参数化知识，而是可以从这个外部知识库中检索信息。</li>
+<li><strong>检索器 (Retriever):</strong> 检索器的任务是从外部知识库中找出与用户查询<strong>最相关</strong>的信息片段（或文档）。这通常通过将查询和知识库中的文档转换为向量（Embedding），然后计算这些向量之间的相似度来实现（例如，使用向量数据库进行最近邻搜索）。</li>
+<li><strong>生成器 (Generator):</strong> 生成器就是 LLM 本身。在 RAG 中，LLM 接收的输入不再仅仅是用户查询，而是“用户查询 + 检索到的相关信息片段”。LLM 利用这些检索到的信息作为上下文，生成最终的答案。这使得 LLM 的回答更加<strong>有依据、准确</strong>，并能涵盖训练数据之外的新知识。</li>
+<li><strong>增强 (Augmentation):</strong> “增强”体现在 LLM 不再是孤立地生成内容，而是<strong>“被检索到的信息所增强”</strong>。检索器为生成器提供了实时的、外部的、可能更精确的事实依据，极大地提升了 LLM 的表现。</li>
+</ol>
+<h3 id="实现步骤"><a href="#实现步骤" class="headerlink" title="实现步骤"></a>实现步骤</h3><p>一个典型的 RAG 系统实现通常包括以下几个主要步骤：</p>
+<ol>
+<li><strong>数据准备与索引 (Data Preparation &amp; Indexing):</strong><ul>
+<li><strong>文档加载 (Document Loading):</strong> 从各种来源（如 <code>.txt</code>, <code>.md</code>, <code>.pdf</code>, <code>.docx</code>, 数据库等）加载原始数据。</li>
+<li><strong>文档分割&#x2F;分块 (Chunking):</strong> 将加载的长文档分割成大小适中、语义连贯的小片段（chunks）。这是关键一步，因为过大或过小的片段都会影响检索效果。常用的策略有固定大小分块、递归字符分块、语义分块等。</li>
+<li><strong>文本嵌入 (Text Embedding):</strong> 使用一个预训练的文本嵌入模型（如 <code>SentenceTransformer</code> 模型）将每个文本片段转换为高维数值向量（Embedding）。这些向量捕获了文本的语义信息。</li>
+<li><strong>向量存储 (Vector Store):</strong> 将这些文本向量及其对应的原始文本片段存储到向量数据库（如 ChromaDB, Faiss, Pinecone, Weaviate 等）中。向量数据库能够高效地进行向量相似度搜索。</li>
+</ul>
+</li>
+<li><strong>检索 (Retrieval):</strong><ul>
+<li><strong>查询嵌入 (Query Embedding):</strong> 当用户提出一个问题（Query）时，使用与文档嵌入相同的嵌入模型，将用户查询也转换为一个向量。</li>
+<li><strong>相似度搜索 (Similarity Search):</strong> 在向量数据库中执行相似度搜索，找出与用户查询向量最相似的 <code>Top-K</code> 个文档片段。这些片段被认为是与用户问题最相关的上下文。</li>
+</ul>
+</li>
+<li><strong>（可选）重排 (Reranking):</strong><ul>
+<li>为了进一步提高检索的精确性，可以引入一个<strong>重排器</strong>（通常是 Cross-Encoder 模型）。</li>
+<li>重排器会接收用户查询和初步检索到的 <code>Top-K</code> 个片段，并对每个“查询-片段”对生成一个更精细的相关性分数。</li>
+<li>根据这些分数，重新排序并选择 <code>Top-N</code> 个（通常 <code>N &lt; K</code>）最相关的片段，以提供给生成器更精炼、更高质量的上下文。</li>
+</ul>
+</li>
+<li><strong>生成 (Generation):</strong><ul>
+<li><strong>构建 Prompt (Prompt Construction):</strong> 将用户查询和经过检索&#x2F;重排得到的 <code>Top-N</code> 个相关文本片段组合成一个结构化的 Prompt。这个 Prompt 会明确指示 LLM 的角色、任务，并包含“基于提供的上下文作答，不要编造信息”等指令。</li>
+<li><strong>LLM 推理 (LLM Inference):</strong> 将构建好的 Prompt 发送给大语言模型（如 Google Gemini, OpenAI GPT 等）。LLM 利用其强大的语言理解和生成能力，结合提供的上下文信息，生成一个连贯、准确的答案。</li>
+<li><strong>答案输出 (Answer Output):</strong> LLM 返回生成的答案，呈现给用户。</li>
+</ul>
+</li>
+</ol>
+<p>以下是一个简单的搭建原理图：</p>
+<p><img src="/imgs/RAG%20%E7%A4%BA%E6%84%8F%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="RAG 示意图"></p>
+<h3 id="核心组件概览"><a href="#核心组件概览" class="headerlink" title="核心组件概览"></a>核心组件概览</h3><ol>
+<li><strong>知识库 (Knowledge Base)：</strong> 你的云讯通内部资料（文档、FAQ 等）。</li>
+<li><strong>文档加载器 (Document Loader)：</strong> 读取你的知识库文件。</li>
+<li><strong>文本分割器 (Text Splitter)：</strong> 将长文档分割成小块（<code>chunks</code>），方便检索。</li>
+<li><strong>嵌入模型 (Embedding Model)：</strong> 将文本块和用户问题转换为向量。</li>
+<li><strong>向量数据库 (Vector Store)：</strong> 存储所有文本块的向量，用于快速检索。</li>
+<li><strong>本地大语言模型 (LLM)：</strong> 用于理解问题和生成答案。</li>
+<li><strong>RAG 框架 (LangChain)：</strong> 串联以上所有组件，简化开发。</li>
+</ol>
+<h3 id="Python-实现"><a href="#Python-实现" class="headerlink" title="Python 实现"></a>Python 实现</h3><h4 id="1-环境搭建"><a href="#1-环境搭建" class="headerlink" title="1. 环境搭建"></a>1. 环境搭建</h4><blockquote>
+<p>处理环境问题真的是想说：人难做，屎难吃。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">brew install python@3.12 <br>mkdir rag<br>cd rag<br>uv venv --python 3.12<br>source .venv/bin/activate<br>uv pip install &quot;chromadb&gt;=1.0.15&quot; &quot;google-genai&gt;=1.24.0&quot; &quot;python-dotenv&gt;=1.1.1&quot; &quot;sentence-transformers&gt;=5.0.0&quot;<br></code></pre></td></tr></table></figure>
+
+<h5 id="uv-介绍"><a href="#uv-介绍" class="headerlink" title="uv 介绍"></a>uv 介绍</h5><p><code>uv</code> 是由 <strong>Rye</strong>（由 Astro 框架的创建者 David Wadsley 开发）团队推出的一个<strong>高性能</strong>的 Python 包安装器和解析器。它旨在成为 <code>pip</code> 和 <code>pip-tools</code> 的<strong>超快速替代品</strong>。<code>uv</code> 由于使用 <strong>Rust 编写</strong>， 在执行依赖解析和包安装时比 <code>pip</code> 快 <strong>10 到 100 倍</strong>。这意味着更快的开发周期、更快的 CI&#x2F;CD 构建时间。</p>
+<h5 id="包介绍"><a href="#包介绍" class="headerlink" title="包介绍"></a><strong>包介绍</strong></h5><ul>
+<li><p><strong>sentence_transformers</strong><br>专注于将文本（句子、段落、甚至短文档）转换为高质量的向量（也叫“嵌入”或“embeddings”）。这些向量捕捉了文本的语义信息，使得语义相似的文本在向量空间中的距离也更近。</p>
+</li>
+<li><p><strong>chromadb</strong><br>ChromaDB 是一个 开源的向量数据库 (Vector Database)。它是专门为存储、管理和搜索向量嵌入 (vector embeddings) 而设计的</p>
+</li>
+<li><p><strong>google-genai</strong><br><code>google-genai</code> 是 Google 官方提供的用于<strong>与 Google Gemini 系列模型进行交互的 Python 客户端库</strong>。它是 Google AI Studio 和 Gemini API 的官方 SDK</p>
+</li>
+<li><p><strong>python-dotenv</strong><br>用于加载 <code>.env</code> 文件中的环境变量</p>
+</li>
+</ul>
+<h5 id="获取-Google-Gemini-接口ID"><a href="#获取-Google-Gemini-接口ID" class="headerlink" title="获取 Google Gemini 接口ID"></a><strong>获取 Google Gemini 接口ID</strong></h5><ul>
+<li>前往<a target="_blank" rel="noopener" href="https://aistudio.google.com/apikey">Gemini 官网</a>注册获取。</li>
+<li>创建文件 <code>.env</code></li>
+<li>输入 <code>GEMINI_API_KEY=xxx</code></li>
+</ul>
+<h4 id="2-代码逻辑"><a href="#2-代码逻辑" class="headerlink" title="2. 代码逻辑"></a>2. 代码逻辑</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> <span class="hljs-type">List</span><br><span class="hljs-keyword">import</span> chromadb<br><span class="hljs-keyword">from</span> sentence_transformers <span class="hljs-keyword">import</span> SentenceTransformer, CrossEncoder<br><span class="hljs-keyword">from</span> dotenv <span class="hljs-keyword">import</span> load_dotenv<br><span class="hljs-keyword">from</span> google <span class="hljs-keyword">import</span> genai<br><br><span class="hljs-comment"># 识别模型放在本地，以免重复下载</span><br>LOCAL_EMBEDDING_MODEL_PATH = <span class="hljs-string">&quot;./local_models/text2vec-base-chinese&quot;</span><br>LOCAL_CROSS_ENCODER_MODEL_PATH = <span class="hljs-string">&quot;./local_models/mmarco-mMiniLMv2-L12-H384-v1&quot;</span><br>  <br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">split_into_chunks</span>(<span class="hljs-params">doc_file: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>]:<br>	<span class="hljs-keyword">with</span> <span class="hljs-built_in">open</span>(doc_file, <span class="hljs-string">&#x27;r&#x27;</span>) <span class="hljs-keyword">as</span> file:<br>	content = file.read()<br>	<span class="hljs-keyword">return</span> [chunk <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> content.split(<span class="hljs-string">&quot;\n\n&quot;</span>)]<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">embed_chunk</span>(<span class="hljs-params">chunk: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-built_in">float</span>]:<br>	embedding = embedding_model.encode(chunk, normalize_embeddings=<span class="hljs-literal">True</span>)<br>	<span class="hljs-keyword">return</span> embedding.tolist()<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">save_embeddings</span>(<span class="hljs-params">chunks: <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>], embeddings: <span class="hljs-type">List</span>[<span class="hljs-type">List</span>[<span class="hljs-built_in">float</span>]]</span>) -&gt; <span class="hljs-literal">None</span>:<br>	<span class="hljs-keyword">for</span> i, (chunk, embedding) <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(<span class="hljs-built_in">zip</span>(chunks, embeddings)):<br>	chromadb_collection.add(<br>	documents=[chunk],<br>	embeddings=[embedding],<br>	ids=[<span class="hljs-built_in">str</span>(i)]<br>	)<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">retrieve</span>(<span class="hljs-params">query: <span class="hljs-built_in">str</span>, top_k: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>]:<br>	query_embedding = embed_chunk(query)<br>	results = chromadb_collection.query(<br>	query_embeddings=[query_embedding],<br>	n_results=top_k<br>	)<br>	<span class="hljs-keyword">return</span> results[<span class="hljs-string">&#x27;documents&#x27;</span>][<span class="hljs-number">0</span>]<br>  <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">rerank</span>(<span class="hljs-params">query: <span class="hljs-built_in">str</span>, retrieved_chunks: <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>], top_k: <span class="hljs-built_in">int</span></span>) -&gt; <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>]:<br>	cross_encoder = CrossEncoder(LOCAL_CROSS_ENCODER_MODEL_PATH)<br>	pairs = [(query, chunk) <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> retrieved_chunks]<br>	scores = cross_encoder.predict(pairs)<br>	scored_chunks = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">zip</span>(retrieved_chunks, scores))<br>	scored_chunks.sort(key=<span class="hljs-keyword">lambda</span> x: x[<span class="hljs-number">1</span>], reverse=<span class="hljs-literal">True</span>)<br>	<span class="hljs-keyword">return</span> [chunk <span class="hljs-keyword">for</span> chunk, _ <span class="hljs-keyword">in</span> scored_chunks][:top_k]<br>  <br><span class="hljs-keyword">def</span> <span class="hljs-title function_">generate</span>(<span class="hljs-params">query: <span class="hljs-built_in">str</span>, chunks: <span class="hljs-type">List</span>[<span class="hljs-built_in">str</span>]</span>) -&gt; <span class="hljs-built_in">str</span>:<br>	prompt = <span class="hljs-string">f&quot;&quot;&quot;</span><br><span class="hljs-string">	你是一位知识助手，请根据用户的问题和下列片段生成准确的回答。</span><br><span class="hljs-string">	用户问题: <span class="hljs-subst">&#123;query&#125;</span></span><br><span class="hljs-string">	相关片段:<span class="hljs-subst">&#123;<span class="hljs-string">&quot;\n\n&quot;</span>.join(chunks)&#125;</span></span><br><span class="hljs-string">	请基于上述内容作答，不要编造信息。</span><br><span class="hljs-string">	&quot;&quot;&quot;</span><br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;prompt&#125;</span>\n\n---\n&quot;</span>)<br>	response = google_client.models.generate_content(<br>	model=<span class="hljs-string">&quot;gemini-2.5-flash&quot;</span>,<br>	contents=prompt<br>	)<br>	<span class="hljs-keyword">return</span> response.text<br><br>  <br>query = <span class="hljs-built_in">input</span>(<span class="hljs-string">&quot;请输入你的问题：&quot;</span>)<br>embedding_model = SentenceTransformer(LOCAL_EMBEDDING_MODEL_PATH)<br>chromadb_client = chromadb.EphemeralClient()<br>chromadb_collection = chromadb_client.get_or_create_collection(name=<span class="hljs-string">&quot;default&quot;</span>)<br>chunks = split_into_chunks(<span class="hljs-string">&quot;doc.md&quot;</span>) <span class="hljs-comment"># 拿到文本信息</span><br>embeddings = [embed_chunk(chunk) <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> chunks] <span class="hljs-comment"># 切分词条</span><br>save_embeddings(chunks, embeddings) <span class="hljs-comment"># 存入数据库</span><br>retrieved_chunks = retrieve(query, <span class="hljs-number">5</span>) <span class="hljs-comment"># 计算相似度，拿到前5个相关片段</span><br>reranked_chunks = rerank(query, retrieved_chunks, <span class="hljs-number">5</span>) <span class="hljs-comment"># 使用CrossEncoder为片段重新排序</span><br>load_dotenv() <span class="hljs-comment"># 加载环境变量-API密钥</span><br>google_client = genai.Client() <span class="hljs-comment"># 初始化Google GenAI客户端</span><br>answer = generate(query, reranked_chunks) <span class="hljs-comment"># 生成回答</span><br><span class="hljs-built_in">print</span>(answer)<br></code></pre></td></tr></table></figure>
+
+<h3 id="前后端搭建"><a href="#前后端搭建" class="headerlink" title="前后端搭建"></a>前后端搭建</h3><blockquote>
+<p>使用 flask</p>
+</blockquote>
+<h4 id="后端（Flask-API）"><a href="#后端（Flask-API）" class="headerlink" title="后端（Flask API）"></a>后端（Flask API）</h4><ul>
+<li>主流程已在 main.py 封装为 get_answer(question: str) -&gt; str，实现了分块、嵌入、检索、重排、生成等RAG流程。</li>
+<li>API接口在 app.py，提供 &#x2F;ask POST接口，接收 JSON 格式问题，返回智能问答结果。</li>
+<li>欢迎页：根路径 &#x2F; 支持 GET，返回欢迎信息。</li>
+<li>端口：Flask 服务运行在 5001 端口。</li>
+</ul>
+<h4 id="前端（Streamlit）"><a href="#前端（Streamlit）" class="headerlink" title="前端（Streamlit）"></a>前端（Streamlit）</h4><ul>
+<li>文件：webui.py</li>
+<li>功能：</li>
+<li>顶部渐变标题与副标题</li>
+<li>左侧：智能对话区（历史消息、输入框、发送按钮）</li>
+<li>右侧：系统核心功能、技术架构、统计信息、FAQ快捷提问</li>
+<li>FAQ一键提问，自动调用后端API</li>
+<li>对话历史自动刷新</li>
+<li>兼容性：已将 st.experimental_rerun() 替换为 st.rerun()，适配新版</li>
+</ul>
+<h4 id="依赖管理"><a href="#依赖管理" class="headerlink" title="依赖管理"></a>依赖管理</h4><ul>
+<li>requirements.txt 已包含 Flask、streamlit、requests、sentence-transformers、chromadb、python-dotenv、google-generativeai 等依赖。</li>
+</ul>
+<h4 id="启动与测试流程"><a href="#启动与测试流程" class="headerlink" title="启动与测试流程"></a>启动与测试流程</h4><ol>
+<li><p>后端启动</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">source</span> .venv/bin/activate<br>python3 app.py<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>前端启动</p>
+ <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">streamlit run webui.py<br></code></pre></td></tr></table></figure></li>
+</ol>
+<p>访问 <a target="_blank" rel="noopener" href="http://localhost:8501/">http://localhost:8501</a></p>
+<h4 id="下一步建议"><a href="#下一步建议" class="headerlink" title="下一步建议"></a>下一步建议</h4><ul>
+<li>可继续美化前端、增加对话清空、导出、用户登录等功能</li>
+<li>可考虑部署到服务器，供团队或客户使用</li>
+<li>可扩展知识库、支持多文档、权限管理等</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Python/" class="category-chain-item">Python</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Python/" class="print-no-link">#Python</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>一个RAG系统的实现</div>
+      <div>http://aandnet.lorden.xyz/2025/07/09/一个RAG系统的实现/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Jay Lorden</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年7月9日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/06/17/hexo-%E7%BD%91%E7%AB%99%E5%BB%BA%E7%AB%99/" title="hexo 网站建站">
+                        <span class="hidden-mobile">hexo 网站建站</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/8.14.0/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default","mermaidVersion":"9.4.3","startOnLoad":true});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
